@@ -56,7 +56,7 @@ test('debounce once', function() {
         scounter = 0,
         rcounter = 0;
 
-    expect(3);
+    expect(6);
     stop();
 
     middleware(req, null, noop);
@@ -68,6 +68,8 @@ test('debounce once', function() {
 
     req.session.reload = function(cb) {
         rcounter++;
+        equal(typeof req.session._debounce, 'object', 'debounce store attached');
+        equal(typeof req.session._debounce.a, 'number', 'timestamp attached');
         cb();
     };
 
@@ -79,8 +81,9 @@ test('debounce once', function() {
         equal(dcounter, 1, 'debounced function called only once');
         equal(scounter, 2, 'session saved amount');
         equal(rcounter, 1, 'session reload amount');
+        equal(req.session._debounce, null, 'debounce map removed from session');
         start();
-    }, 1000);
+    }, 1100);
 });
 
 test('debounce multiple', function() {
@@ -112,5 +115,5 @@ test('debounce multiple', function() {
     setTimeout(function() {
         equal(counter, 1, 'debounced function called only once');
         start();
-    }, 3000);
+    }, 3100);
 });

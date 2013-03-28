@@ -1,14 +1,16 @@
 {
-    "name": "",
-    "description": "",
+    "name": "connect-debounce",
+    "description": "Distributed debounced function execution ala underscore on per session basis as connect middleware.",
     "version": "0.1.0",
     "author": "Oleg Slobodskoi <oleg008@gmail.com>",
     "repository": {
         "type": "git",
-        "url": "http://github.com/kof/XXX.git"
+        "url": "http://github.com/kof/connect-debounce.git"
     },
-    "keywords": [],
-    "engines": {},
+    "keywords": ["debounce", "per session", "underscore", "delay", "delayed execution"],
+    "engines": {
+        "node": ">= 0.5.0"
+    },
     "devDependencies": {
         "qunit": "0.5.16"
     },
