@@ -1,0 +1,24 @@
+{
+    "name": "",
+    "description": "",
+    "version": "0.1.0",
+    "author": "Oleg Slobodskoi <oleg008@gmail.com>",
+    "repository": {
+        "type": "git",
+        "url": "http://github.com/kof/XXX.git"
+    },
+    "keywords": [],
+    "engines": {},
+    "devDependencies": {
+        "qunit": "0.5.16"
+    },
+    "scripts": {
+        "test": "node_modules/qunit/bin/cli.js -c debounce:./index.js -t ./test.js"
+    },
+    "licenses": [
+        {
+           "type": "MIT",
+           "url": "http://www.opensource.org/licenses/mit-license.php"
+        }
+    ]
+}
