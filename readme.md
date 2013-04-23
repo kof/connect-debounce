@@ -10,7 +10,7 @@ If user interaction is followed by a request to the server and has heavy task to
 
 ### How
 
-Module will save the date of the last attempt to execute the function into the session store of connect. On every attempt to execute it again, it will check the date and prevent execution more often than the `wait` time defined for the named function.
+Module will save the date of the last attempt to execute the function into the session store of connect. On every attempt to execute it again, it will check the date and prevent execution more often than the `wait` time defined for the function.
 
 ### Setup
 
@@ -30,10 +30,11 @@ Example:
         })
         .listen(3000);
 
-### req.debounce(fn:Function, [wait:Number])
+### req.debounce(fn:Function, [wait:Number], [immediate:Boolean])
 
-- `fn` is a named function which execution will be debounced. Its name is at the same time its unique identifier. It can get an error object passed as first argument. Don't ignore it!
+- `fn` is a function which execution will be debounced. It can get an error object passed as first argument. Don't ignore it! Better to use a function name to avoid potential conflicts with some other debounced function which has the same implementation.
 - `wait` time in ms to wait, default is the value described in setup.
+- `immediate` exec function immediately and debounce it later
 
 Example:
 

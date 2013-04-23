@@ -1,7 +1,7 @@
 {
     "name": "connect-debounce",
     "description": "Distributed debounced function execution ala underscore on per session basis as connect middleware.",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "author": "Oleg Slobodskoi <oleg008@gmail.com>",
     "repository": {
         "type": "git",

@@ -42,11 +42,7 @@ test('debounce arguments validation', function() {
 
     throws(function() {
         req.debounce();
-    }, 'Named function required.');
-
-    throws(function() {
-        req.debounce(function() {});
-    }, 'Named function required.');
+    }, 'Function required.');
 });
 
 test('debounce once', function() {
@@ -54,9 +50,10 @@ test('debounce once', function() {
         req = getReq(),
         dcounter = 0,
         scounter = 0,
-        rcounter = 0;
+        rcounter = 0,
+        id;
 
-    expect(6);
+    expect(8);
     stop();
 
     middleware(req, null, noop);
@@ -69,24 +66,63 @@ test('debounce once', function() {
     req.session.reload = function(cb) {
         rcounter++;
         equal(typeof req.session._debounce, 'object', 'debounce store attached');
-        equal(typeof req.session._debounce.a, 'number', 'timestamp attached');
+        equal(typeof req.session._debounce[id], 'number', 'timestamp attached');
         cb();
     };
-
-    req.debounce(function a() {
+    id = req.debounce(function() {
         dcounter++;
     });
 
     setTimeout(function() {
         equal(dcounter, 1, 'debounced function called only once');
-        equal(scounter, 2, 'session saved amount');
+        equal(scounter, 1, 'session saved amount');
+        equal(rcounter, 2, 'session reload amount');
+        equal(req.session._debounce, null, 'debounce map removed from session');
+        start();
+    }, 2050);
+});
+
+test('debounce with immedaite=true', function() {
+    var middleware = debounce(),
+        req = getReq(),
+        dcounter = 0,
+        scounter = 0,
+        rcounter = 0,
+        id;
+
+    expect(7);
+    stop();
+
+    middleware(req, null, noop);
+
+    req.session.save = function(cb) {
+        scounter++;
+        cb();
+    };
+
+    req.session.reload = function(cb) {
+        rcounter++;
+        equal(typeof req.session._debounce, 'object', 'debounce store attached');
+        equal(typeof req.session._debounce[id], 'number', 'timestamp attached');
+        cb();
+    };
+
+    id = req.debounce(function() {
+        dcounter++;
+    }, true);
+
+    equal(dcounter, 1, 'debounced function called immediately');
+
+    setTimeout(function() {
+        equal(dcounter, 1, 'debounced function called only once');
+        equal(scounter, 1, 'session saved amount');
         equal(rcounter, 1, 'session reload amount');
         equal(req.session._debounce, null, 'debounce map removed from session');
         start();
-    }, 1100);
+    }, 1020);
 });
 
-test('debounce multiple', function() {
+test('debounce multiple times', function() {
     var middleware = debounce(),
         req = getReq(),
         counter = 0;
@@ -96,24 +132,52 @@ test('debounce multiple', function() {
 
     middleware(req, null, noop);
 
-    req.debounce(function a() {
+    function fn() {
         counter++;
-    }, 2000);
+    }
+
+    req.debounce(fn, 2000);
 
     setTimeout(function() {
-        req.debounce(function a() {
-            counter++;
-        }, 2000);
-    }, 500);
-
-    setTimeout(function() {
-        req.debounce(function a() {
-            counter++;
-        }, 2000);
+        req.debounce(fn, 2000);
     }, 1000);
 
     setTimeout(function() {
-        equal(counter, 1, 'debounced function called only once');
+        req.debounce(fn, 2000);
+    }, 2000);
+
+    setTimeout(function() {
+        equal(counter, 1, 'debounced function called once');
         start();
-    }, 3100);
+    }, 5000);
+});
+
+test('debounce multiple times with immediate=true', function() {
+    var middleware = debounce(),
+        req = getReq(),
+        counter = 0;
+
+    expect(1);
+    stop();
+
+    middleware(req, null, noop);
+
+    function fn() {
+        counter++;
+    }
+
+    req.debounce(fn, 2000, true);
+
+    setTimeout(function() {
+        req.debounce(fn, 2000, true);
+    }, 1000);
+
+    setTimeout(function() {
+        req.debounce(fn, 2000, true);
+    }, 2000);
+
+    setTimeout(function() {
+        equal(counter, 2, 'debounced function called only once');
+        start();
+    }, 5000);
 });
