@@ -39,7 +39,7 @@ Example:
 Example:
 
     app.get('/', function(req, res, next) {
-        req.debounce(function myDebouncedFnIdentifier(err) {
+        req.debounce(function(err) {
             if (err) {
 
                 // Request is already responded, log the error.
