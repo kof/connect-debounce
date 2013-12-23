@@ -75,14 +75,15 @@ test('debounce once', function() {
 
     setTimeout(function() {
         equal(dcounter, 1, 'debounced function called only once');
-        equal(scounter, 1, 'session saved amount');
+        equal(scounter, 3, 'session saved amount');
         equal(rcounter, 2, 'session reload amount');
         equal(req.session._debounce, null, 'debounce map removed from session');
         start();
     }, 2050);
 });
 
-test('debounce with immedaite=true', function() {
+
+test('debounce with immediate=true', function() {
     var middleware = debounce(),
         req = getReq(),
         dcounter = 0,
@@ -115,7 +116,7 @@ test('debounce with immedaite=true', function() {
 
     setTimeout(function() {
         equal(dcounter, 1, 'debounced function called only once');
-        equal(scounter, 1, 'session saved amount');
+        equal(scounter, 2, 'session saved amount');
         equal(rcounter, 1, 'session reload amount');
         equal(req.session._debounce, null, 'debounce map removed from session');
         start();
