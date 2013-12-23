@@ -1,10 +1,14 @@
 QUnit.module('debounce');
 
-function getReq() {
+function getReq(reloadTimeout, saveTimeout) {
     var req = {session: {}};
 
-    req.session.reload = req.session.save = function(cb) {
-        cb();
+    req.session.reload = function(cb) {
+        setTimeout(cb, reloadTimeout);
+    };
+
+    req.session.save = function(cb) {
+        setTimeout(cb, saveTimeout);
     };
 
     return req;
@@ -179,6 +183,33 @@ test('debounce multiple times with immediate=true', function() {
 
     setTimeout(function() {
         equal(counter, 2, 'debounced function called only once');
+        start();
+    }, 5000);
+});
+
+test('double call with immediate=true, second call faster than session store roundtrip', function() {
+    var middleware = debounce(),
+        reloadTimeout = 500,
+        req = getReq(reloadTimeout, 0),
+        counter = 0;
+
+    expect(1);
+    stop();
+
+    middleware(req, null, noop);
+
+    function fn() {
+        counter++;
+    }
+
+    req.debounce(fn, 500, true);
+
+    setTimeout(function () {
+        req.debounce(fn, 500, true);
+    }, reloadTimeout / 2);
+
+    setTimeout(function() {
+        equal(counter, 1, 'debounced function called only once');
         start();
     }, 5000);
 });

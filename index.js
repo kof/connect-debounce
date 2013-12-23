@@ -14,7 +14,6 @@ module.exports = function(opts) {
     opts || (opts = {});
     opts.wait || (opts.wait = 1000);
 
-
     function debounce(fn, wait, immediate) {
         var req = this,
             map, id;
@@ -40,6 +39,11 @@ module.exports = function(opts) {
                     if (err) return fn(err);
 
                     map = req.session._debounce;
+
+                    if (!map || !map[id]) {
+                        return;
+                    }
+
                     if (map[id] + wait < Date.now()) {
                         debounce.call(req, fn, wait, true);
                     }
