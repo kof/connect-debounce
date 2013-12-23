@@ -1,10 +1,14 @@
 QUnit.module('debounce');
 
-function getReq() {
+function getReq(reloadTimeout, saveTimeout) {
     var req = {session: {}};
 
-    req.session.reload = req.session.save = function(cb) {
-        cb();
+    req.session.reload = function(cb) {
+        setTimeout(cb, reloadTimeout);
+    };
+
+    req.session.save = function(cb) {
+        setTimeout(cb, saveTimeout);
     };
 
     return req;
@@ -75,14 +79,15 @@ test('debounce once', function() {
 
     setTimeout(function() {
         equal(dcounter, 1, 'debounced function called only once');
-        equal(scounter, 1, 'session saved amount');
+        equal(scounter, 3, 'session saved amount');
         equal(rcounter, 2, 'session reload amount');
         equal(req.session._debounce, null, 'debounce map removed from session');
         start();
     }, 2050);
 });
 
-test('debounce with immedaite=true', function() {
+
+test('debounce with immediate=true', function() {
     var middleware = debounce(),
         req = getReq(),
         dcounter = 0,
@@ -115,7 +120,7 @@ test('debounce with immedaite=true', function() {
 
     setTimeout(function() {
         equal(dcounter, 1, 'debounced function called only once');
-        equal(scounter, 1, 'session saved amount');
+        equal(scounter, 2, 'session saved amount');
         equal(rcounter, 1, 'session reload amount');
         equal(req.session._debounce, null, 'debounce map removed from session');
         start();
@@ -178,6 +183,33 @@ test('debounce multiple times with immediate=true', function() {
 
     setTimeout(function() {
         equal(counter, 2, 'debounced function called only once');
+        start();
+    }, 5000);
+});
+
+test('double call with immediate=true, second call faster than session store roundtrip', function() {
+    var middleware = debounce(),
+        reloadTimeout = 500,
+        req = getReq(reloadTimeout, 0),
+        counter = 0;
+
+    expect(1);
+    stop();
+
+    middleware(req, null, noop);
+
+    function fn() {
+        counter++;
+    }
+
+    req.debounce(fn, 500, true);
+
+    setTimeout(function () {
+        req.debounce(fn, 500, true);
+    }, reloadTimeout / 2);
+
+    setTimeout(function() {
+        equal(counter, 1, 'debounced function called only once');
         start();
     }, 5000);
 });
